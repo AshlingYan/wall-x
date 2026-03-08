@@ -1,0 +1,160 @@
+# Training Configuration for stack_blocks_test_v1
+# 修正版：正确配置关节角数据
+
+# Model and paths configuration
+log_name: "stack_blocks_training"
+log_project: "wall_x_training"
+model_type: qwen2_5
+use_fast_tokenizer: false
+pretrained_wallx_path: "/data/vla/wall-x/hf_home/hub/models--x-square-robot--wall-oss-flow-v0.1/snapshots/325f0307b724ac4d1da4564c242c29d17f13ef9e"
+action_tokenizer_path: "/data/vla/wall-x/assets/fast/"
+qwen_vl_act_config_path: "/data/vla/wall-x/hf_home/hub/models--x-square-robot--wall-oss-flow-v0.1/snapshots/325f0307b724ac4d1da4564c242c29d17f13ef9e/config.json"
+
+save_path: "/data/vla/wall-x/checkpoints/stack_blocks_joint"
+
+# Torch Profile
+profile: False
+profile_save_path: /data/vla/wall-x/profile/
+profile_wait_iters: 10
+profile_warmup_iters: 5
+profile_active_iters: 2
+
+# Training hyperparameters (针对15条数据优化)
+num_warmup_steps: 10
+num_training_steps: 300
+learning_rate: 0.00005
+min_lr: 0.00001
+num_epoch: 30
+gradient_accumulation_steps: 2
+batch_size_per_gpu: 1
+padding_side: left
+epoch_save_interval: 5
+FSDP2: false
+torch_compile: false
+
+# Robot configuration - 双臂机器人 (14维: 7左臂 + 7右臂)
+# 注意：数据集存储的是关节角度，不是末端位姿！
+dof_config:
+  follow_left_joint_1: 1       # 实际对应左臂关节1角度 (l1)
+  follow_left_joint_2: 1       # 实际对应左臂关节2角度 (l2)
+  follow_left_joint_3: 1       # 实际对应左臂关节3角度 (l3)
+  follow_left_joint_4: 1       # 实际对应左臂关节4角度 (l4)
+  follow_left_joint_5: 1       # 实际对应左臂关节5角度 (l5)
+  follow_left_joint_6: 1       # 实际对应左臂关节6角度 (l6)
+  follow_left_gripper: 1       # 实际对应左臂夹爪 (gl)
+  follow_right_joint_1: 1      # 实际对应右臂关节1角度 (r1)
+  follow_right_joint_2: 1      # 实际对应右臂关节2角度 (r2)
+  follow_right_joint_3: 1      # 实际对应右臂关节3角度 (r3)
+  follow_right_joint_4: 1      # 实际对应右臂关节4角度 (r4)
+  follow_right_joint_5: 1      # 实际对应右臂关节5角度 (r5)
+  follow_right_joint_6: 1      # 实际对应右臂关节6角度 (r6)
+  follow_right_gripper: 1      # 实际对应右臂夹爪 (gr)
+
+agent_pos_config:
+  master_left_joint_1: 1
+  master_left_joint_2: 1
+  master_left_joint_3: 1
+  master_left_joint_4: 1
+  master_left_joint_5: 1
+  master_left_joint_6: 1
+  master_left_gripper: 1
+  master_right_joint_1: 1
+  master_right_joint_2: 1
+  master_right_joint_3: 1
+  master_right_joint_4: 1
+  master_right_joint_5: 1
+  master_right_joint_6: 1
+  master_right_gripper: 1
+
+norm_stats_path: "/data/vla/wall-x/assets/action_stats/stack_blocks_norm_stats.json"
+
+enable_customized_robot_config: true
+customized_robot_config:
+  name: "stack_blocks"
+  customized_dof_config:
+    l1: 1
+    l2: 1
+    l3: 1
+    l4: 1
+    l5: 1
+    l6: 1
+    gl: 1
+    r1: 1
+    r2: 1
+    r3: 1
+    r4: 1
+    r5: 1
+    r6: 1
+    gr: 1
+
+  customized_agent_pos_config:
+    l1: 1
+    l2: 1
+    l3: 1
+    l4: 1
+    l5: 1
+    l6: 1
+    gl: 1
+    r1: 1
+    r2: 1
+    r3: 1
+    r4: 1
+    r5: 1
+    r6: 1
+    gr: 1
+
+# Data configuration
+data:
+  use_lerobot: true
+
+  lerobot_config:
+    repo_id: "stack_blocks_test_v1"
+    root: "/data/vla/stack_blocks_test_v1"
+    episodes: null
+    image_transforms: null
+    delta_timestamps: null
+    tolerance_s: 1e-4
+    revision: null
+    force_cache_sync: false
+    download_videos: true
+    video_backend: null
+
+  action_horizon: 10
+  train_test_split: 0.9
+
+  obs_action_keys:
+    - follow_left_joint_1
+    - follow_left_joint_2
+    - follow_left_joint_3
+    - follow_left_joint_4
+    - follow_left_joint_5
+    - follow_left_joint_6
+    - follow_left_gripper
+    - follow_right_joint_1
+    - follow_right_joint_2
+    - follow_right_joint_3
+    - follow_right_joint_4
+    - follow_right_joint_5
+    - follow_right_joint_6
+    - follow_right_gripper
+
+  predict_action_keys:
+    - master_left_joint_1
+    - master_left_joint_2
+    - master_left_joint_3
+    - master_left_joint_4
+    - master_left_joint_5
+    - master_left_joint_6
+    - master_left_gripper
+    - master_right_joint_1
+    - master_right_joint_2
+    - master_right_joint_3
+    - master_right_joint_4
+    - master_right_joint_5
+    - master_right_joint_6
+    - master_right_gripper
+
+  resolution:
+    face_view: 256
+    left_wrist_view: 256
+    right_wrist_view: 256

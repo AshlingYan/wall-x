@@ -1,0 +1,103 @@
+# Train LIBERO dataset from Qwen-2.5-VL (VLM backbone)
+# Single-arm 7-DOF: cartesian_pos(3) + rotation(3) + gripper(1)
+
+# Model and paths configuration
+log_name: "libero_all_vlm"
+log_project: "vla_training"
+model_type: qwen2_5
+pretrained_wallx_path: "/data/vla/wall-x/assets/wall-oss-fast"
+save_path: "/data/vla/wall-x/checkpoints_vlm"
+use_fast_tokenizer: True                       # True: train FAST, False: train Flow
+action_tokenizer_path: "/data/vla/wall-x/assets/fast"
+qwen_vl_act_config_path: "/data/vla/wall-x/workspace/lerobot_example/qwen25_config_libero.json"
+
+
+# Torch Profile
+profile: False
+profile_save_path: /data/vla/wall-x/profile/
+profile_wait_iters: 10
+profile_warmup_iters: 5
+profile_active_iters: 2
+
+# Training hyperparameters
+num_warmup_steps: 100
+num_training_steps: 64000000
+learning_rate: 0.00009
+min_lr: 0.00005
+num_epoch: 100
+gradient_accumulation_steps: 32
+batch_size_per_gpu: 8
+padding_side: left
+epoch_save_interval: 1
+
+# Training optimization settings
+FSDP2: True
+torch_compile: False
+
+# Robot configuration - LIBERO single-arm 7-DOF action space
+dof_config:
+  follow_right_ee_cartesian_pos: 3     # End-effector Cartesian position (x,y,z)
+  follow_right_ee_rotation: 3          # End-effector rotation
+  follow_right_gripper: 1              # Gripper control
+
+# Agent proprioception configuration - LIBERO single-arm 7-DOF state
+agent_pos_config:
+  master_right_ee_cartesian_pos: 3
+  master_right_ee_rotation: 3
+  master_right_gripper: 1
+
+# # Checkpoint resuming configuration
+# resume:
+#   ckpt: "/data/vla/wall-x/checkpoints_vlm/0"
+#   load_ckpt_only: false
+
+norm_stats_path: "/data/vla/wall-x/assets/action_stats/all_robots_action_stats.json"
+
+enable_customized_robot_config: true
+customized_robot_config:
+  name: "libero_all"
+  customized_dof_config:
+    "follow_right_ee_cartesian_pos": 3
+    "follow_right_ee_rotation": 3
+    "follow_right_gripper": 1
+
+  customized_agent_pos_config:
+    "master_right_ee_cartesian_pos": 3
+    "master_right_ee_rotation": 3
+    "master_right_gripper": 1
+
+# Data configuration
+data:
+  use_lerobot: true
+
+  # LeRobot dataset configuration
+  lerobot_config:
+    repo_id: "libero_all"
+    root: "/data/vla/wall-x/libero_all"
+    episodes: null
+    image_transforms: null
+    delta_timestamps: null
+    tolerance_s: 1e-4
+    revision: null
+    force_cache_sync: false
+    download_videos: false
+    video_backend: pyav
+
+  action_horizon: 15                   # LIBERO fps=15
+  train_test_split: 0.95
+
+  # Action keys for observation and prediction (must match dof_config keys)
+  obs_action_keys:
+    - master_right_ee_cartesian_pos
+    - master_right_ee_rotation
+    - master_right_gripper
+
+  predict_action_keys:
+    - follow_right_ee_cartesian_pos
+    - follow_right_ee_rotation
+    - follow_right_gripper
+
+  # Image resolution configuration - only face_view and right_wrist_view for libero_all
+  resolution:
+    face_view: 256
+    right_wrist_view: 256
