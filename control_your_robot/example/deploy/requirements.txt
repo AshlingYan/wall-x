@@ -1,0 +1,33 @@
+# Wall-X Deployment Requirements
+# For stack_blocks task with dual-arm robot (14-dim actions)
+
+# PyTorch and dependencies
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
+torchdiffeq==0.2.5
+
+# Transformers and multimodal
+transformers==4.49.0
+qwen-vl-utils==0.0.11
+Pillow
+opencv-python
+
+# Numerical computing
+numpy>=2.0.0
+
+# Model utilities
+safetensors==0.7.0
+diffusers==0.36.0
+
+# Training/inference utilities (optional for deployment)
+accelerate>=1.10.0
+peft>=0.17.1
+
+# Config handling
+PyYAML
+omegaconf>=2.3.0
+ruamel.yaml>=0.18.0
+
+# Note: Install PyTorch with CUDA support:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124

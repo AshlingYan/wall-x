@@ -185,7 +185,7 @@ tramp
 *.pt
 *.ckpt
 ckpt/
-checkpoints/
+# checkpoints/
 
 # Output directories
 outputs/
@@ -275,7 +275,7 @@ libero_all/
 assets/action_stats/
 assets/fast/
 assets/wall-oss-fast/
-control_your_robot/
+# control_your_robot/
 
 # Training files
 training.log
